@@ -1,5 +1,6 @@
 require 'yaml'
 require 'highline'
+require 'active_support/core_ext/hash'
 
 class BsPlus::Config
   HomePath  = File.expand_path '~/.browserstack-cred'
