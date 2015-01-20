@@ -4,7 +4,6 @@ require 'bs_plus/config'
 BsPlus::Config.init # will ask for username/password if not present, hehe
 
 require 'bs_plus/cli'
-require 'bs_plus/browser'
 
 module BsPlus
 end
