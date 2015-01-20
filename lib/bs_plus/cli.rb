@@ -2,6 +2,7 @@ require 'thor'
 require 'rest-client'
 require 'json'
 require 'parallel'
+require 'bs_plus'
 require 'bs_plus/browser'
 
 module BsPlus
