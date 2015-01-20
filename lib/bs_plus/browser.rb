@@ -20,7 +20,7 @@ class Browser < Hashie::Dash
 
   def self.all
     FileCache.fetch('browser.list', expires_in: 24.hours) {
-      @list ||= RestClient.get("https://#{Config.fetch(:username)}:#{Config.fetch(:password)}"\
+      @list ||= RestClient.get("https://#{BsPlus::Config.fetch(:username)}:#{BsPlus::Config.fetch(:password)}"\
                                "@www.browserstack.com/automate/browsers.json").
         tap! {|e| JSON.parse e}.
         map {|e| new e}}
@@ -51,7 +51,7 @@ class Browser < Hashie::Dash
     }
 
     driver = Selenium::WebDriver.for(:remote,
-      url: "https://#{Config.fetch(:username)}:#{Config.fetch(:password)}"\
+      url: "https://#{BsPlus::Config.fetch(:username)}:#{BsPlus::Config.fetch(:password)}"\
            "@hub.browserstack.com/wd/hub",
       desired_capabilities: caps)
 
