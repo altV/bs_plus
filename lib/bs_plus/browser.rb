@@ -9,6 +9,7 @@ require 'cgi'
 
 module BsPlus
 class Browser < Hashie::Dash
+  include Hashie::Extensions::Dash::IndifferentAccess
   property :browser
   property :browser_version
   property :os
