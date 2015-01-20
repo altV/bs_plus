@@ -1,6 +1,6 @@
 require 'thor'
 require 'rest-client'
-require 'json'
+require 'json' unless defined? JSON # wtf is can't activate json-1.8.0, already activated json-1.8.1 (Gem::LoadError)
 require 'parallel'
 require 'bs_plus'
 require 'bs_plus/browser'
