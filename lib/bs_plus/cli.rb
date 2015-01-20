@@ -2,6 +2,7 @@ require 'thor'
 require 'rest-client'
 require 'json'
 require 'parallel'
+require 'bs_plus/browser'
 
 module BsPlus
   class Cli < Thor
@@ -12,17 +13,22 @@ module BsPlus
       Browser.all.each {|e| puts e }
     end
 
+    BrowsersOption = {
+      'desktop'  => Browser::Desktop,
+      'ies'      => Browser::IEs,
+      'androids' => Browser::Androids,
+      'mobile'   => Browser::Mobile,
+      'popular'  => Browser::Popular,
+    }
+
     desc 'get WHAT [-b BROWSERS]', 'takes snapshot(s)'
-    method_option :browsers, default: 'popular', aliases: '-b'
+    method_option :browsers, default: 'desktop', aliases: '-b',
+      desc:"#{BrowsersOption.keys.to_sentence} or one from 'bs list'"
     def get url
       url = "http://#{url}" unless url[/http/]
 
-      case options[:browsers]
-      when 'popular' then Browser::Popular
-      when 'ies'     then Browser::IEs
-      else
-        Browser.parse options[:browsers]
-      end.
+      (BrowsersOption[options[:browsers]] ||
+       Browser.parse(options[:browsers])).
         tap {|e| puts "Snapshotting with #{e.size} browsers:"}.
         tap!{|e| Parallel.map(e, in_threads: 5) {|b| b.snapshot url}}
     end

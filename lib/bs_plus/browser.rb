@@ -26,12 +26,21 @@ class Browser < Hashie::Dash
         map {|e| new e}}
   end
 
-  Popular = [
-    new({browser: 'ie', browser_version: '7.0', os: 'Windows', os_version: 'XP'}),
+  Desktop = [
+    new({browser: 'ie', browser_version: '8.0',  os: 'Windows', os_version: '7'}),
+    new({browser: 'ie', browser_version: '9.0',  os: 'Windows', os_version: '7'}),
+    new({browser: 'ie', browser_version: '10.0', os: 'Windows', os_version: '7'}),
+    new({browser: 'ie', browser_version: '11.0', os: 'Windows', os_version: '7'}),
+    new({browser: 'firefox', browser_version: '30.0', os: 'Windows', os_version: '7'}),
+    new({browser: 'chrome',  browser_version: '33.0', os: 'Windows', os_version: '7'}),
   ]
-
-  IEs = all.select {|e| e.browser[/ie/i]}
-
+  IEs      = all.select {|e| e.browser[/ie/i]}
+  Androids = all.select {|e| e.os[/android/i]}
+  Mobile   = [
+    new({browser: 'android', browser_version: '', os: 'android', os_version: '4.4', device: 'Samsung Galaxy S5'}),
+    new({browser: 'iphone', browser_version: '', os: 'ios', os_version: '7.0', device: 'iPhone 5C'}),
+  ]
+  Popular = (Desktop + Mobile)
 
   def snapshot url
     # Input capabilities
@@ -46,13 +55,17 @@ class Browser < Hashie::Dash
            "@hub.browserstack.com/wd/hub",
       desired_capabilities: caps)
 
-    puts "Starting #{self}"
-    driver.navigate.to url
-    puts "Reached #{driver.title} from #{self}, saving screenshot"
-    driver.save_screenshot(file = CGI.escape("#{url}__#{self}.png"))
-    driver.quit
-    puts "Done #{self}"
-    Launchy.open "./#{file}"
+    begin
+      puts "Starting #{self}"
+      driver.navigate.to url
+      puts "Reached #{driver.title} from #{self}, saving screenshot"
+      driver.save_screenshot(file = CGI.escape("#{url}__#{self}.png"))
+      driver.quit
+      puts "Done #{self}"
+      Launchy.open "./#{file}"
+    rescue => e
+      puts "#{e.inspect} from #{self}"
+    end
   end
 
   def to_s
