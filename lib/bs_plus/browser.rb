@@ -47,8 +47,9 @@ class Browser < Hashie::Dash
     # Input capabilities
     caps = Selenium::WebDriver::Remote::Capabilities.new.tap {|c|
       self.stringify_keys.select{|k,v| v}.each {|k,v| c[k] = v}
-      c["browserstack.debug"] = "true"
-      c["name"]               = "Running BrowserStack from command line"
+      c["browserstack.debug"] = 'true'
+      c['browserstack.local'] = 'true'
+      c["name"]               = 'Running bs_plus from command line'
     }
 
     driver = Selenium::WebDriver.for(:remote,
