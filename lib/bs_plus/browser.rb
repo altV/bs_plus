@@ -61,11 +61,12 @@ class Browser < Hashie::Dash
       driver.navigate.to url
       puts "Reached #{driver.title} from #{self}, saving screenshot"
       driver.save_screenshot(file = CGI.escape("#{url}__#{self}.png"))
-      driver.quit
       puts "Done #{self}"
       Launchy.open "./#{file}"
     rescue => e
       puts "#{e.inspect} from #{self}"
+    ensure
+      driver.quit
     end
   end
 
