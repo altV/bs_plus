@@ -6,6 +6,7 @@ require 'selenium-webdriver'
 require 'launchy'
 require 'hashie'
 require 'cgi'
+require 'capybara'
 require 'bs_plus/config'
 
 module BsPlus
@@ -43,12 +44,80 @@ class Browser < Hashie::Dash
   ]
   Popular = (Desktop + Mobile)
 
-  def snapshot url
-    # Input capabilities
+
+  def new_session options={}
+    options.reverse_merge! local: true
     caps = Selenium::WebDriver::Remote::Capabilities.new.tap {|c|
       self.stringify_keys.select{|k,v| v}.each {|k,v| c[k] = v}
       c["browserstack.debug"] = 'true'
-      c['browserstack.local'] = 'true'
+      c['browserstack.local'] = (!!options[:local]).to_s
+      c['acceptSslCerts']     = 'true'
+      c["name"]               = 'Running bs_plus from command line'
+    }
+
+    Capybara.register_driver(:"#{to_s}") { |app|
+      Capybara::Selenium::Driver.new(app, browser: :remote,
+        url: "https://#{Config.fetch(:username)}:#{Config.fetch(:password)}"\
+             "@hub.browserstack.com/wd/hub",
+        desired_capabilities: caps) }
+
+    yield (s = Capybara::Session.new(:"#{to_s}"))
+  ensure
+    s.driver.quit
+  end
+
+  def snapshot url
+    new_session do |browser|
+      puts "Starting #{self}"
+      browser.visit url
+      puts "Reached #{browser.title} from #{self}, saving screenshot"
+      browser.save_screenshot file = CGI.escape("#{url}__#{self}.png")
+      puts "Done #{self}"
+      Launchy.open "./#{file}"
+    end
+  rescue => e
+    puts "#{e.inspect} from #{self}"
+  end
+
+  def to_s
+    "#{browser}#{browser_version}"\
+    "(#{os}-#{os_version}#{':' + device if device})"
+  end
+
+  def self.parse browser_string
+    all.select {|b| b.to_s[Regexp.new browser_string, 'i']}
+  end
+
+  def self.logins
+    @logins ||= begin
+      File.expand_path('~/.loginfile.rb').tap! {|home_path|  load home_path  if File.exists? home_path }
+      File.expand_path('./.loginfile.rb').tap! {|local_path| load local_path if File.exists? local_path }
+
+      (defined?(LoginsGlobal) ? LoginsGlobal : {}).merge(defined?(LoginsLocal) ? LoginsLocal : {})
+    end
+  end
+
+  def self.actions
+    @actions ||= begin
+      File.expand_path('~/.loginfile.rb').tap! {|home_path|  load home_path  if File.exists? home_path }
+      File.expand_path('./.loginfile.rb').tap! {|local_path| load local_path if File.exists? local_path }
+
+      (defined?(ActionsGlobal) ? ActionsGlobal : {}).merge(defined?(ActionsLocal) ? ActionsLocal : {})
+    end
+  end
+
+
+
+
+
+
+  def raw_selenium_session options={}
+    options.reverse_merge! local: true
+    caps = Selenium::WebDriver::Remote::Capabilities.new.tap {|c|
+      self.stringify_keys.select{|k,v| v}.each {|k,v| c[k] = v}
+      c["browserstack.debug"] = 'true'
+      c['browserstack.local'] = (!!options[:local]).to_s
+      c['acceptSslCerts']     = 'true'
       c["name"]               = 'Running bs_plus from command line'
     }
 
@@ -56,24 +125,7 @@ class Browser < Hashie::Dash
       url: "https://#{Config.fetch(:username)}:#{Config.fetch(:password)}"\
            "@hub.browserstack.com/wd/hub",
       desired_capabilities: caps)
-
-    begin
-      puts "Starting #{self}"
-      driver.navigate.to url
-      puts "Reached #{driver.title} from #{self}, saving screenshot"
-      driver.save_screenshot(file = CGI.escape("#{url}__#{self}.png"))
-      puts "Done #{self}"
-      Launchy.open "./#{file}"
-    rescue => e
-      puts "#{e.inspect} from #{self}"
-    ensure
-      driver.quit
-    end
   end
 
-  def to_s
-    "#{browser}#{browser_version}"\
-    "(#{os}-#{os_version}#{':' + device if device})"
-  end
 end
 end

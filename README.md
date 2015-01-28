@@ -27,3 +27,7 @@ Currently there's a binary named bs, it prints its usage.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+Launch with
+RUBYLIB=lib bundle exec rescue bin/bs get google.com -b "ie8"
+or RUBYLIB pry -rbs_plus

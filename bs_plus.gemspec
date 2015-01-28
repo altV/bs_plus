@@ -28,9 +28,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hashie', '>3.1.0'
   spec.add_dependency 'launchy', '>=2.4.0'
   spec.add_dependency 'selenium-webdriver', '>=2.44.0'
+  spec.add_dependency 'capybara', '>=2.2.1'
+  spec.add_dependency 'os', '>=0.9.4'
+  spec.add_dependency 'childprocess', '>=0.5.5'
 
   spec.add_development_dependency 'bundler', '~> 1.6'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'pry-rescue'
+  spec.add_development_dependency 'pry-doc'
+  # spec.add_development_dependency 'pry-stack_explorer'
   spec.add_development_dependency 'pry'
 end

@@ -3,15 +3,15 @@ require 'highline'
 require 'active_support/core_ext/hash'
 
 class BsPlus::Config
-  HomePath  = File.expand_path '~/.browserstack-cred'
-  LocalPath = File.expand_path './.browserstack-cred'
+  HomePath  = File.expand_path '~/.browserstack-plus'
+  LocalPath = File.expand_path './.browserstack-plus'
 
   class <<self
   def init
-    fetch(:username) {HighLine.new.ask('Please enter your browserstack username')}
+    fetch(:username) {HighLine.new.ask('Please enter your browserstack username').to_s}
 
     fetch(:password) {HighLine.new.ask('Please enter your password') {|h|
-                                       h.echo = false  }}
+                                       h.echo = false  }.to_s}
   end
 
   OtherDefaults =
