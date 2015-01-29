@@ -58,7 +58,7 @@ class Browser < Hashie::Dash
     Capybara.register_driver(:"#{to_s}") { |app|
       Capybara::Selenium::Driver.new(app, browser: :remote,
         url: "https://#{Config.fetch(:username)}:#{Config.fetch(:password)}"\
-             "@hub.browserstack.com/wd/hub",
+             "@hub-eu.browserstack.com/wd/hub",
         desired_capabilities: caps) }
 
     yield (s = Capybara::Session.new(:"#{to_s}"))

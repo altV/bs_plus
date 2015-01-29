@@ -14,7 +14,7 @@ module BsPlus
             '-force', '-forcelocal', Config.fetch(:password)
     p.io.inherit!
     p.start
-    sleep 0.5
+    sleep 4.5
     raise "Problem with tunnel" unless p.alive?
     yield
   ensure
